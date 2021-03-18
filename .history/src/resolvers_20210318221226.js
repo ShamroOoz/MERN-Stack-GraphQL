@@ -12,7 +12,6 @@ const books = [
 const resolvers = {
   Query: {
     books: () => books,
-    user: () => console.log("get users"),
   },
 };
 

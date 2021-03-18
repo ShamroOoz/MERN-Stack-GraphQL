@@ -7,7 +7,7 @@ const typeDefs = gql`
   }
   type Query {
     books: [Book]
-    user: [Book]
+    user: [users]
   }
 `;
 
