@@ -3,25 +3,50 @@ import express from "express";
 import typeDefs from "./src/typeDefs";
 import resolvers from "./src/resolvers";
 import { dbconnection } from "./src/helper/db";
+import connectRedis from "connect-redis";
+import session from "express-session";
+import Redis from "ioredis";
+import { APOLLO_OPTIONS, SESS_OPTIONS, PORT, REDIS_OPTIONS } from "./config";
 
-// env
-const PORT = process.env.PORT || 4000;
-const IN_PROD = process.env.NODE_ENV === "production";
+(async () => {
+  try {
+    await dbconnection();
+    console.log("Connected to database");
 
-//db connection
-dbconnection();
+    const app = express();
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  playground: !IN_PROD,
-});
+    // session redis store
+    const RedisStore = connectRedis(session);
 
-const app = express();
-server.applyMiddleware({ app });
+    const store = new RedisStore({
+      client: new Redis(REDIS_OPTIONS),
+      // client: REDIS_OPTIONS, //todo fix this
+    });
 
-app.disable("x-powered-by");
+    //session
+    const sessionHandler = session({
+      store,
+      ...SESS_OPTIONS,
+    });
 
-app.listen(PORT, () =>
-  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
-);
+    app.use(sessionHandler);
+
+    app.disable("x-powered-by");
+
+    const server = new ApolloServer({
+      ...APOLLO_OPTIONS,
+      typeDefs,
+      resolvers,
+      context: ({ req, res }) => ({ req, res }),
+    });
+
+    server.applyMiddleware({ app });
+
+    app.listen(PORT, () =>
+      console.log(`🚀 Server ready at http://localhost:${PORT}`)
+    );
+  } catch (error) {
+    console.error(error);
+    throw new ApolloError(error);
+  }
+})();
