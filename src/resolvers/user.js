@@ -2,17 +2,11 @@ import User from "../Model/User";
 import { SingupSchema, SignInSchema } from "../Schema/SingupSchema";
 import mongoose from "mongoose";
 import { JOI_OPTION } from "../../config";
-import {
-  ensureSignedIn,
-  ensureSignedOut,
-  attemptSignIn,
-  signOut,
-} from "../helper/auth";
+import { attemptSignIn, signOut } from "../helper/auth";
 export default {
   Query: {
     me: async (root, args, { req, res }, info) => {
       try {
-        ensureSignedIn(req);
         return await User.findById(req.session.userId);
       } catch (error) {
         throw new Error(error);
@@ -20,7 +14,6 @@ export default {
     },
     users: async (root, args, { req, res }, info) => {
       try {
-        ensureSignedIn(req);
         return await User.find();
       } catch (error) {
         throw new Error(error);
@@ -28,7 +21,6 @@ export default {
     },
     user: async (root, { id }, { req, res }, info) => {
       try {
-        ensureSignedIn(req);
         if (!mongoose.Types.ObjectId.isValid(id)) {
           throw new UserInputError("User id NOT EXIST", id);
         }
@@ -41,13 +33,12 @@ export default {
   Mutation: {
     Signin: async (root, args, { req, res }, info) => {
       try {
-        const { userId } = req.session;
-        if (userId) {
-          return await User.findById(userId);
-        }
+        // const { userId } = req.session;
+        // if (userId) {
+        //   return await User.findById(userId);
+        // }
         await SignInSchema.validateAsync(args, { ...JOI_OPTION });
         const user = await attemptSignIn(args);
-        console.log(user);
         req.session.userId = user._id;
         return user;
       } catch (error) {
@@ -56,7 +47,6 @@ export default {
     },
     signout: async (root, args, { req, res }, info) => {
       try {
-        ensureSignedIn(req);
         return await signOut(req, res);
       } catch (error) {
         throw new Error(error);
@@ -64,7 +54,6 @@ export default {
     },
     Signup: async (root, args, { req, res }, info) => {
       try {
-        ensureSignedOut(req);
         await SingupSchema.validateAsync(args, { ...JOI_OPTION });
         const addUser = new User({
           name: args.name,
@@ -72,7 +61,9 @@ export default {
           email: args.email,
           password: args.password,
         });
-        await addUser.save();
+        const user = await addUser.save();
+        req.session.userId = user._id;
+        return user;
       } catch (error) {
         throw new Error(error);
       }

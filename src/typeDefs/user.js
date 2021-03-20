@@ -2,9 +2,9 @@ import { gql } from "apollo-server-express";
 
 export default gql`
   extend type Query {
-    me: user
-    user(id: ID!): user
-    users: [user!]!
+    me: user @auth
+    user(id: ID!): user @auth
+    users: [user!]! @auth
   }
   extend type Mutation {
     Signup(
@@ -13,16 +13,16 @@ export default gql`
       name: String!
       password: String!
       repeat_password: String!
-    ): user
-    Signin(email: String!, password: String!): user
-    signout: Boolean
+    ): user @guest
+    Signin(email: String!, password: String!): user @guest
+    signout: Boolean @auth
   }
   type user {
     _id: ID!
     username: String!
     name: String!
     email: String!
-    createdAt: String!
-    updatedAt: String!
+    createdAt: String! @date(format: "isoDateTime")
+    updatedAt: String! @date(format: "isoDateTime")
   }
 `;

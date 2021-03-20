@@ -2,6 +2,7 @@ import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import typeDefs from "./src/typeDefs";
 import resolvers from "./src/resolvers";
+import schemaDirectives from "./src/Directive";
 import { dbconnection } from "./src/helper/db";
 import connectRedis from "connect-redis";
 import session from "express-session";
@@ -20,7 +21,6 @@ import { APOLLO_OPTIONS, SESS_OPTIONS, PORT, REDIS_OPTIONS } from "./config";
 
     const store = new RedisStore({
       client: new Redis(REDIS_OPTIONS),
-      // client: REDIS_OPTIONS, //todo fix this
     });
 
     //session
@@ -37,6 +37,7 @@ import { APOLLO_OPTIONS, SESS_OPTIONS, PORT, REDIS_OPTIONS } from "./config";
       ...APOLLO_OPTIONS,
       typeDefs,
       resolvers,
+      schemaDirectives,
       context: ({ req, res }) => ({ req, res }),
     });
 

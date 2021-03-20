@@ -3,8 +3,7 @@ import { AuthenticationError } from "apollo-server-express";
 import { SESS_NAME } from "../../config";
 
 export const attemptSignIn = async ({ email, password }) => {
-  const user = await User.findOne({ email }).select(`password`);
-
+  const user = await User.findOne({ email });
   if (!user || !(await user.matchesPassword(password))) {
     throw new AuthenticationError(
       "Incorrect email or password. Please try again."

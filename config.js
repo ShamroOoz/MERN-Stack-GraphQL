@@ -12,9 +12,9 @@ export const {
   SESS_SECRET = "ssh!secret!",
   SESS_LIFETIME = ONE_DAY,
 
-  REDIS_HOST = "localhost",
+  REDIS_HOST = "127.0.0.1",
   REDIS_PORT = 6379,
-  REDIS_PASSWORD = "secret",
+  REDIS_PASSWORD = "auth",
 } = process.env;
 
 export const IN_PROD = NODE_ENV === "production";
@@ -38,8 +38,8 @@ export const APOLLO_OPTIONS = {
 };
 
 export const REDIS_OPTIONS = {
-  host: REDIS_HOST,
   port: +REDIS_PORT,
+  host: REDIS_HOST,
   password: REDIS_PASSWORD,
 };
 

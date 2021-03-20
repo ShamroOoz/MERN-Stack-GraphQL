@@ -23,6 +23,7 @@
     "apollo-server-express": "^2.19.2",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^5.1.0",
+    "dateformat": "^4.5.1",
     "express-session": "^1.17.1",
     "graphql": "^15.4.0",
     "ioredis": "^4.24.2",
